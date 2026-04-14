@@ -1,4 +1,4 @@
-# FixIT Backend 🔧
+# FixIT🔧
 ### Smart Maintenance Management System — Node.js + Express + MongoDB
 
 ---
