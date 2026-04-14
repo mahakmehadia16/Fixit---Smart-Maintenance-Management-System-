@@ -1,0 +1,1153 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FixIT — Smart Maintenance System</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0c10;
+  --surface:#111318;
+  --surface2:#181c24;
+  --border:#232830;
+  --accent:#00e5a0;
+  --accent2:#5b8fff;
+  --warn:#ffb547;
+  --danger:#ff4f4f;
+  --text:#e8eaf0;
+  --muted:#6b7280;
+  --font-head:'Syne',sans-serif;
+  --font-body:'DM Sans',sans-serif;
+  --font-mono:'DM Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:14px;min-height:100vh;overflow-x:hidden}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,12,16,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 2rem;height:56px}
+.nav-logo{font-family:var(--font-head);font-size:18px;font-weight:800;color:var(--accent);letter-spacing:-.02em}
+.nav-logo span{color:var(--text)}
+.nav-links{display:flex;gap:4px}
+.nav-link{background:none;border:none;color:var(--muted);font-family:var(--font-body);font-size:13px;padding:6px 14px;border-radius:6px;cursor:pointer;transition:all .15s}
+.nav-link:hover,.nav-link.active{color:var(--text);background:var(--surface2)}
+.nav-right{display:flex;align-items:center;gap:10px}
+.role-pill{font-family:var(--font-mono);font-size:11px;padding:4px 10px;border-radius:20px;background:var(--surface2);border:1px solid var(--border);color:var(--muted)}
+.notif-btn{position:relative;background:none;border:none;color:var(--muted);cursor:pointer;padding:6px;display:flex}
+.notif-dot{position:absolute;top:4px;right:4px;width:7px;height:7px;border-radius:50%;background:var(--danger)}
+
+/* PAGES */
+.page{display:none;padding-top:56px;min-height:100vh}
+.page.active{display:block}
+
+/* HERO / LOGIN */
+#page-login{display:flex;align-items:center;justify-content:center;min-height:100vh;padding-top:0;background:var(--bg)}
+.login-wrap{width:100%;max-width:400px;padding:2rem}
+.login-logo{font-family:var(--font-head);font-size:32px;font-weight:800;color:var(--accent);margin-bottom:4px}
+.login-sub{color:var(--muted);font-size:13px;margin-bottom:2rem}
+.form-group{margin-bottom:1rem}
+.form-group label{display:block;font-size:12px;color:var(--muted);font-family:var(--font-mono);margin-bottom:6px;letter-spacing:.05em}
+.form-group input,.form-group select,.form-group textarea{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--font-body);font-size:14px;padding:10px 14px;border-radius:8px;outline:none;transition:border-color .15s}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--accent)}
+.form-group select option{background:var(--surface)}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:8px;border:none;font-family:var(--font-body);font-size:14px;font-weight:500;cursor:pointer;transition:all .15s}
+.btn-primary{background:var(--accent);color:#0a0c10}
+.btn-primary:hover{background:#00c988}
+.btn-ghost{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+.btn-danger{background:rgba(255,79,79,.12);color:var(--danger);border:1px solid rgba(255,79,79,.25)}
+.btn-sm{padding:6px 14px;font-size:12px}
+.btn-full{width:100%;justify-content:center}
+.role-select-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.5rem}
+.role-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.25rem 1rem;cursor:pointer;transition:all .15s;text-align:center}
+.role-card:hover,.role-card.selected{border-color:var(--accent);background:rgba(0,229,160,.06)}
+.role-card .rc-icon{font-size:24px;margin-bottom:8px}
+.role-card .rc-label{font-family:var(--font-head);font-size:13px;font-weight:700}
+.role-card .rc-sub{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* DASHBOARD LAYOUT */
+.dash-layout{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 56px)}
+.sidebar{background:var(--surface);border-right:1px solid var(--border);padding:1.5rem 1rem}
+.sidebar-section{margin-bottom:1.5rem}
+.sidebar-label{font-family:var(--font-mono);font-size:10px;color:var(--muted);letter-spacing:.08em;padding:0 8px;margin-bottom:6px}
+.sidebar-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer;color:var(--muted);font-size:13px;transition:all .15s;border:none;background:none;width:100%;text-align:left}
+.sidebar-item:hover{background:var(--surface2);color:var(--text)}
+.sidebar-item.active{background:rgba(0,229,160,.1);color:var(--accent)}
+.sidebar-item .si-icon{width:16px;text-align:center}
+.badge-count{margin-left:auto;background:var(--danger);color:#fff;font-size:10px;padding:1px 6px;border-radius:10px;font-family:var(--font-mono)}
+.main-content{padding:2rem;overflow-y:auto}
+
+/* SECTION HEADERS */
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem}
+.section-title{font-family:var(--font-head);font-size:22px;font-weight:700}
+.section-sub{color:var(--muted);font-size:13px;margin-top:2px}
+
+/* STAT CARDS */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:2rem}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.25rem}
+.stat-label{font-size:11px;color:var(--muted);font-family:var(--font-mono);letter-spacing:.05em;margin-bottom:6px}
+.stat-value{font-family:var(--font-head);font-size:28px;font-weight:700}
+.stat-value.green{color:var(--accent)}
+.stat-value.blue{color:var(--accent2)}
+.stat-value.warn{color:var(--warn)}
+.stat-value.red{color:var(--danger)}
+.stat-delta{font-size:11px;color:var(--muted);margin-top:4px}
+
+/* TICKETS TABLE */
+.tickets-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:2rem}
+.tickets-header{padding:1rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.tickets-header input{flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:7px 12px;border-radius:7px;font-size:13px;font-family:var(--font-body);outline:none}
+.filter-pills{display:flex;gap:6px}
+.fpill{padding:5px 12px;border-radius:20px;font-size:12px;border:1px solid var(--border);background:none;color:var(--muted);cursor:pointer;font-family:var(--font-mono);transition:all .15s}
+.fpill:hover,.fpill.active{border-color:var(--accent);color:var(--accent);background:rgba(0,229,160,.08)}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;padding:10px 16px;font-size:11px;font-family:var(--font-mono);color:var(--muted);letter-spacing:.06em;border-bottom:1px solid var(--border)}
+td{padding:12px 16px;font-size:13px;border-bottom:1px solid rgba(35,40,48,.6);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--surface2)}
+.tid{font-family:var(--font-mono);font-size:11px;color:var(--muted)}
+.status-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-family:var(--font-mono)}
+.s-pending{background:rgba(255,181,71,.1);color:var(--warn);border:1px solid rgba(255,181,71,.2)}
+.s-progress{background:rgba(91,143,255,.1);color:var(--accent2);border:1px solid rgba(91,143,255,.2)}
+.s-resolved{background:rgba(0,229,160,.1);color:var(--accent);border:1px solid rgba(0,229,160,.2)}
+.s-escalated{background:rgba(255,79,79,.1);color:var(--danger);border:1px solid rgba(255,79,79,.2)}
+.s-dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+.priority-tag{font-size:11px;font-family:var(--font-mono);padding:2px 8px;border-radius:4px}
+.p-high{background:rgba(255,79,79,.1);color:var(--danger)}
+.p-medium{background:rgba(255,181,71,.1);color:var(--warn)}
+.p-low{background:rgba(0,229,160,.1);color:var(--accent)}
+.cat-tag{font-size:11px;padding:2px 8px;border-radius:4px;background:var(--surface2);color:var(--muted)}
+.sla-timer{font-family:var(--font-mono);font-size:12px}
+.sla-ok{color:var(--accent)}
+.sla-warn{color:var(--warn)}
+.sla-breach{color:var(--danger);animation:pulse .8s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.action-btns{display:flex;gap:6px}
+
+/* TICKET FORM */
+.form-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.5rem;max-width:640px}
+.ai-suggestion{background:rgba(0,229,160,.06);border:1px solid rgba(0,229,160,.2);border-radius:8px;padding:12px 14px;margin-top:10px;display:none}
+.ai-suggestion.show{display:block}
+.ai-label{font-size:11px;font-family:var(--font-mono);color:var(--accent);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.ai-label::before{content:'◆';font-size:9px}
+.ai-row{display:flex;gap:8px;flex-wrap:wrap}
+.ai-chip{padding:4px 10px;border-radius:6px;font-size:12px;background:var(--surface2);border:1px solid var(--border);color:var(--text)}
+.photo-upload{border:1px dashed var(--border);border-radius:8px;padding:1.5rem;text-align:center;cursor:pointer;transition:all .15s}
+.photo-upload:hover{border-color:var(--accent);background:rgba(0,229,160,.04)}
+.photo-preview{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.photo-thumb{width:72px;height:72px;border-radius:6px;object-fit:cover;border:1px solid var(--border)}
+
+/* TIMELINE */
+.timeline{padding:1rem 0}
+.tl-item{display:flex;gap:14px;margin-bottom:1.5rem;position:relative}
+.tl-item::before{content:'';position:absolute;left:15px;top:30px;bottom:-24px;width:1px;background:var(--border)}
+.tl-item:last-child::before{display:none}
+.tl-dot{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;border:2px solid}
+.tl-dot.done{background:rgba(0,229,160,.15);border-color:var(--accent);color:var(--accent)}
+.tl-dot.current{background:rgba(91,143,255,.15);border-color:var(--accent2);color:var(--accent2)}
+.tl-dot.pending-dot{background:var(--surface2);border-color:var(--border);color:var(--muted)}
+.tl-dot.escalated-dot{background:rgba(255,79,79,.15);border-color:var(--danger);color:var(--danger)}
+.tl-body{flex:1}
+.tl-title{font-weight:500;font-size:13px;margin-bottom:2px}
+.tl-time{font-size:11px;color:var(--muted);font-family:var(--font-mono)}
+.tl-note{font-size:12px;color:var(--muted);margin-top:4px;padding:8px;background:var(--surface2);border-radius:6px;border:1px solid var(--border)}
+
+/* HEATMAP */
+.heatmap-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:1rem}
+.hm-col{display:flex;flex-direction:column;gap:6px}
+.hm-header{font-size:10px;font-family:var(--font-mono);color:var(--muted);text-align:center;margin-bottom:4px}
+.hm-cell{height:40px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:10px;font-family:var(--font-mono);cursor:pointer;transition:transform .1s}
+.hm-cell:hover{transform:scale(1.1)}
+.hm-0{background:var(--surface2);color:var(--muted)}
+.hm-1{background:rgba(0,229,160,.15);color:var(--accent)}
+.hm-2{background:rgba(0,229,160,.3);color:var(--accent)}
+.hm-3{background:rgba(0,229,160,.5);color:#0a0c10}
+.hm-4{background:var(--accent);color:#0a0c10;font-weight:700}
+
+/* CHART BARS */
+.chart-wrap{display:flex;align-items:flex-end;gap:10px;height:120px;padding:0 4px}
+.chart-bar-col{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1}
+.chart-bar{width:100%;border-radius:4px 4px 0 0;transition:height .3s}
+.chart-label{font-size:10px;font-family:var(--font-mono);color:var(--muted)}
+.chart-val{font-size:11px;font-family:var(--font-mono);color:var(--text)}
+
+/* NOTIFICATION PANEL */
+.notif-panel{position:fixed;top:56px;right:1rem;width:320px;background:var(--surface);border:1px solid var(--border);border-radius:12px;z-index:200;display:none;overflow:hidden}
+.notif-panel.open{display:block}
+.notif-panel-head{padding:14px 16px;border-bottom:1px solid var(--border);font-family:var(--font-head);font-size:14px;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+.notif-item{padding:12px 16px;border-bottom:1px solid var(--border);cursor:pointer}
+.notif-item:hover{background:var(--surface2)}
+.notif-item:last-child{border-bottom:none}
+.notif-title{font-size:13px;margin-bottom:2px}
+.notif-time{font-size:11px;color:var(--muted);font-family:var(--font-mono)}
+.notif-unread{border-left:2px solid var(--accent)}
+
+/* STAR RATING */
+.stars{display:flex;gap:4px}
+.star{font-size:20px;cursor:pointer;color:var(--border);transition:color .1s}
+.star.lit,.star:hover{color:var(--warn)}
+
+/* MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:300;display:none;align-items:center;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1.75rem;width:90%;max-width:520px;max-height:80vh;overflow-y:auto}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem}
+.modal-title{font-family:var(--font-head);font-size:18px;font-weight:700}
+.close-btn{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer}
+
+/* MISC */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.mt{margin-top:1rem}
+.mb{margin-bottom:1rem}
+.flex{display:flex;align-items:center;gap:10px}
+.spacer{flex:1}
+.divider{border:none;border-top:1px solid var(--border);margin:1.25rem 0}
+.empty-state{text-align:center;padding:3rem;color:var(--muted)}
+.empty-icon{font-size:32px;margin-bottom:.75rem}
+.tag-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.avatar{width:32px;height:32px;border-radius:50%;background:rgba(91,143,255,.2);color:var(--accent2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Fix<span>IT</span></div>
+  <div class="nav-links" id="nav-links" style="display:none">
+    <button class="nav-link active" onclick="showTab('dashboard')">Dashboard</button>
+    <button class="nav-link" onclick="showTab('tickets')">Tickets</button>
+    <button class="nav-link" id="nav-new-ticket" onclick="showTab('new-ticket')">+ New Request</button>
+    <button class="nav-link" id="nav-analytics" onclick="showTab('analytics')" style="display:none">Analytics</button>
+    <button class="nav-link" id="nav-heatmap" onclick="showTab('heatmap')" style="display:none">Heatmap</button>
+  </div>
+  <div class="nav-right">
+    <span class="role-pill" id="nav-role-pill" style="display:none">employee</span>
+    <button class="notif-btn" id="notif-btn" onclick="toggleNotif()" style="display:none">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <span class="notif-dot" id="notif-dot"></span>
+    </button>
+    <button class="btn btn-ghost btn-sm" id="logout-btn" onclick="logout()" style="display:none">Logout</button>
+  </div>
+</nav>
+
+<!-- NOTIFICATION PANEL -->
+<div class="notif-panel" id="notif-panel">
+  <div class="notif-panel-head">Notifications <span style="font-size:11px;color:var(--muted);font-weight:400" id="notif-count-txt">3 unread</span></div>
+  <div id="notif-list"></div>
+</div>
+
+<!-- LOGIN PAGE -->
+<div class="page active" id="page-login">
+  <div style="display:flex;align-items:center;justify-content:center;min-height:100vh">
+    <div class="login-wrap">
+      <div class="login-logo">FixIT</div>
+      <div class="login-sub">Smart Maintenance & Escalation System</div>
+      <div class="role-select-grid">
+        <div class="role-card selected" id="role-employee" onclick="selectRole('employee')">
+          <div class="rc-icon">👷</div>
+          <div class="rc-label">Employee</div>
+          <div class="rc-sub">Raise & track requests</div>
+        </div>
+        <div class="role-card" id="role-admin" onclick="selectRole('admin')">
+          <div class="rc-icon">🛡</div>
+          <div class="rc-label">Admin</div>
+          <div class="rc-sub">Manage all tickets</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Name</label>
+        <input type="text" id="login-name" placeholder="Team6" value="Team6">
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="login-email" placeholder="you@company.com" value="john@company.com">
+      </div>
+      <button class="btn btn-primary btn-full" onclick="doLogin()">Enter System →</button>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD PAGE -->
+<div class="page" id="page-dashboard">
+  <div class="dash-layout">
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">MENU</div>
+        <button class="sidebar-item active" onclick="showTab('dashboard')"><span class="si-icon">⬛</span> Dashboard</button>
+        <button class="sidebar-item" onclick="showTab('tickets')"><span class="si-icon">📋</span> My Tickets <span class="badge-count" id="sb-ticket-count">0</span></button>
+        <button class="sidebar-item" onclick="showTab('new-ticket')"><span class="si-icon">＋</span> New Request</button>
+      </div>
+      <div class="sidebar-section" id="admin-sidebar" style="display:none">
+        <div class="sidebar-label">ADMIN</div>
+        <button class="sidebar-item" onclick="showTab('all-tickets')"><span class="si-icon">📂</span> All Tickets</button>
+        <button class="sidebar-item" onclick="showTab('analytics')"><span class="si-icon">📊</span> Analytics</button>
+        <button class="sidebar-item" onclick="showTab('heatmap')"><span class="si-icon">🔥</span> Heatmap</button>
+      </div>
+      <div style="margin-top:auto;padding-top:1rem">
+        <div style="display:flex;align-items:center;gap:10px;padding:10px">
+          <div class="avatar" id="sb-avatar">JD</div>
+          <div><div style="font-size:13px;font-weight:500" id="sb-name">John Doe</div><div style="font-size:11px;color:var(--muted)" id="sb-role">employee</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="main-content" id="main-content">
+      <!-- Content injected by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: TICKET DETAIL -->
+<div class="modal-bg" id="modal-detail">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title" id="modal-ticket-title">Ticket Detail</div>
+      <button class="close-btn" onclick="closeModal()">✕</button>
+    </div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<!-- MODAL: RATE TICKET -->
+<div class="modal-bg" id="modal-rate">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">Rate this Resolution</div>
+      <button class="close-btn" onclick="document.getElementById('modal-rate').classList.remove('open')">✕</button>
+    </div>
+    <div id="modal-rate-body">
+      <p style="color:var(--muted);font-size:13px;margin-bottom:1rem">How satisfied were you with the resolution?</p>
+      <div class="stars" id="rate-stars">
+        <span class="star" onclick="setRating(1)">★</span>
+        <span class="star" onclick="setRating(2)">★</span>
+        <span class="star" onclick="setRating(3)">★</span>
+        <span class="star" onclick="setRating(4)">★</span>
+        <span class="star" onclick="setRating(5)">★</span>
+      </div>
+      <div class="form-group mt">
+        <label>Comment (optional)</label>
+        <textarea id="rate-comment" rows="3" placeholder="Anything to add..."></textarea>
+      </div>
+      <button class="btn btn-primary" onclick="submitRating()">Submit Rating</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Socket.IO CDN -->
+<script src="https://cdn.socket.io/4.6.2/socket.io.min.js"></script>
+
+<script>
+// ================================================================
+// CONFIG — change this to your backend URL
+// ================================================================
+const API = 'http://localhost:5000/api';
+
+// ================================================================
+// STATE
+// ================================================================
+let currentUser  = null;
+let currentRole  = 'employee';
+let authToken    = null;
+let tickets      = [];
+let notifications= [];
+let filterStatus = 'all';
+let selectedRating = 0;
+let ratingTicketId = null;
+let socket       = null;
+
+// ================================================================
+// API HELPER — every fetch goes through here
+// ================================================================
+async function api(method, path, body = null, isFormData = false) {
+  const opts = {
+    method,
+    headers: { ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}) },
+  };
+  if (body) {
+    if (isFormData) {
+      opts.body = body; // FormData — don't set Content-Type (browser sets boundary)
+    } else {
+      opts.headers['Content-Type'] = 'application/json';
+      opts.body = JSON.stringify(body);
+    }
+  }
+  const res = await fetch(API + path, opts);
+  const data = await res.json();
+  if (!data.success) throw new Error(data.message || 'API error');
+  return data;
+}
+
+// ================================================================
+// SOCKET.IO REAL-TIME
+// ================================================================
+function connectSocket() {
+  socket = io('http://localhost:5000');
+  socket.on('connect', () => {
+    console.log('🔌 Socket connected');
+    if (currentUser?.id) socket.emit('join', currentUser.id);
+  });
+  socket.on('ticket:new', ({ ticketId, title }) => {
+    addNotifLocal(`📋 New ticket ${ticketId}: ${title}`);
+    if (currentRole === 'admin') loadTickets();
+  });
+  socket.on('ticket:updated', ({ ticketId, status }) => {
+    addNotifLocal(`🔄 Ticket ${ticketId} → ${status}`);
+    loadTickets();
+  });
+  socket.on('ticket:escalated', ({ ticketId, title, label }) => {
+    addNotifLocal(`🚨 ${ticketId} escalated to ${label}!`);
+    loadTickets();
+  });
+  socket.on('ticket:resolved', ({ ticketId }) => {
+    addNotifLocal(`✅ Ticket ${ticketId} resolved`);
+    loadTickets();
+  });
+  socket.on('ticket:sla_warning', ({ ticketId, minutesLeft }) => {
+    addNotifLocal(`⚠️ ${ticketId} — only ${minutesLeft} min left!`);
+  });
+}
+
+// ================================================================
+// LOADING SPINNER
+// ================================================================
+function showLoading(containerId, msg = 'Loading...') {
+  document.getElementById(containerId).innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:center;padding:3rem;color:var(--muted);gap:10px">
+      <div style="width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite"></div>
+      ${msg}
+    </div>`;
+}
+// inject spin keyframe once
+const _spinStyle = document.createElement('style');
+_spinStyle.textContent = `@keyframes spin{to{transform:rotate(360deg)}}`;
+document.head.appendChild(_spinStyle);
+
+function showError(containerId, msg) {
+  document.getElementById(containerId).innerHTML =
+    `<div style="padding:2rem;color:var(--danger);text-align:center">⚠ ${msg}</div>`;
+}
+
+// ================================================================
+// LOGIN
+// ================================================================
+function selectRole(r) {
+  currentRole = r;
+  document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('role-' + r).classList.add('selected');
+}
+
+async function doLogin() {
+  const email    = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-name').value.trim(); // password reuses the "name" field
+  if (!email) { alert('Enter your email'); return; }
+  if (!password) { alert('Enter your password'); return; }
+
+  const btn = document.querySelector('#page-login .btn-primary');
+  btn.textContent = 'Signing in…'; btn.disabled = true;
+
+  try {
+    const data = await api('POST', '/auth/login', { email, password });
+    authToken   = data.token;
+    currentUser = data.user;
+    currentRole = data.user.role === 'superadmin' ? 'admin' : data.user.role;
+
+    // Save token for page refresh
+    localStorage.setItem('fixit_token', authToken);
+    localStorage.setItem('fixit_user', JSON.stringify(currentUser));
+
+    setupNav();
+    connectSocket();
+    await loadNotifications();
+    showTab('dashboard');
+  } catch (err) {
+    alert('Login failed: ' + err.message);
+  } finally {
+    btn.textContent = 'Enter System →'; btn.disabled = false;
+  }
+}
+
+function setupNav() {
+  document.getElementById('nav-links').style.display = 'flex';
+  document.getElementById('nav-role-pill').style.display = '';
+  document.getElementById('nav-role-pill').textContent = currentRole;
+  document.getElementById('notif-btn').style.display = '';
+  document.getElementById('logout-btn').style.display = '';
+  if (currentRole === 'admin') {
+    document.getElementById('nav-analytics').style.display = '';
+    document.getElementById('nav-heatmap').style.display = '';
+    document.getElementById('admin-sidebar').style.display = '';
+    document.getElementById('nav-new-ticket').style.display = 'none';
+  } else {
+    document.getElementById('admin-sidebar').style.display = 'none';
+    document.getElementById('nav-new-ticket').style.display = '';
+  }
+  const name = currentUser.name;
+  document.getElementById('sb-name').textContent = name;
+  document.getElementById('sb-role').textContent = currentRole;
+  document.getElementById('sb-avatar').textContent = name.split(' ').map(x => x[0]).join('').slice(0, 2).toUpperCase();
+}
+
+function logout() {
+  authToken = null; currentUser = null;
+  localStorage.removeItem('fixit_token');
+  localStorage.removeItem('fixit_user');
+  if (socket) { socket.disconnect(); socket = null; }
+  document.getElementById('nav-links').style.display = 'none';
+  document.getElementById('nav-role-pill').style.display = 'none';
+  document.getElementById('notif-btn').style.display = 'none';
+  document.getElementById('logout-btn').style.display = 'none';
+  showPage('page-login');
+}
+
+// ================================================================
+// NAVIGATION
+// ================================================================
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => { p.classList.remove('active'); p.style.display = 'none'; });
+  const el = document.getElementById(id);
+  el.style.display = ''; el.classList.add('active');
+}
+
+function showTab(tab) {
+  showPage('page-dashboard');
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach(l => l.classList.remove('active'));
+  if (tab === 'dashboard')   renderDashboard();
+  else if (tab === 'tickets')     renderTicketsList(false);
+  else if (tab === 'all-tickets') renderTicketsList(true);
+  else if (tab === 'new-ticket')  renderNewTicket();
+  else if (tab === 'analytics')   renderAnalytics();
+  else if (tab === 'heatmap')     renderHeatmap();
+}
+
+// ================================================================
+// SLA HELPER
+// ================================================================
+function slaDisplay(ticket) {
+  if (ticket.status === 'resolved' || ticket.status === 'closed')
+    return '<span class="sla-ok">Resolved</span>';
+  const deadline = new Date(ticket.slaDeadline);
+  const diff = deadline - Date.now();
+  if (diff < 0) return '<span class="sla-breach">BREACHED</span>';
+  const h = Math.floor(diff / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  const cls = diff < 1800000 ? 'sla-warn' : 'sla-ok';
+  return `<span class="${cls}">${h}h ${m}m</span>`;
+}
+
+// ================================================================
+// LOAD TICKETS FROM BACKEND
+// ================================================================
+async function loadTickets(params = '') {
+  try {
+    const endpoint = currentRole === 'admin'
+      ? `/tickets?${params}`
+      : `/tickets?mine=true&${params}`;
+    const data = await api('GET', endpoint);
+    tickets = data.tickets;
+    return tickets;
+  } catch (err) {
+    console.error('loadTickets error:', err);
+    return [];
+  }
+}
+
+// ================================================================
+// DASHBOARD
+// ================================================================
+async function renderDashboard() {
+  showPage('page-dashboard');
+  showLoading('main-content', 'Loading dashboard…');
+  try {
+    let stats, recentTickets;
+    if (currentRole === 'admin') {
+      const data = await api('GET', '/analytics/dashboard');
+      stats = data.stats;
+      const ticketData = await api('GET', '/tickets?limit=5&sortBy=createdAt&order=desc');
+      recentTickets = ticketData.tickets;
+    } else {
+      const data = await api('GET', '/analytics/my-stats');
+      stats = data.stats;
+      recentTickets = data.recentTickets;
+    }
+
+    tickets = recentTickets; // update local cache
+    document.getElementById('sb-ticket-count').textContent = stats.total;
+
+    document.getElementById('main-content').innerHTML = `
+      <div class="section-head">
+        <div>
+          <div class="section-title">Welcome back, ${currentUser.name.split(' ')[0]}</div>
+          <div class="section-sub">${new Date().toDateString()} — ${currentRole === 'admin' ? 'Admin View' : 'Employee View'}</div>
+        </div>
+        ${currentRole === 'employee' ? `<button class="btn btn-primary" onclick="showTab('new-ticket')">+ New Request</button>` : ''}
+      </div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-label">PENDING</div><div class="stat-value warn">${stats.pending}</div><div class="stat-delta">Awaiting assignment</div></div>
+        <div class="stat-card"><div class="stat-label">IN PROGRESS</div><div class="stat-value blue">${stats.inProgress}</div><div class="stat-delta">Being worked on</div></div>
+        <div class="stat-card"><div class="stat-label">RESOLVED</div><div class="stat-value green">${stats.resolved}</div><div class="stat-delta">Completed tickets</div></div>
+        <div class="stat-card"><div class="stat-label">ESCALATED</div><div class="stat-value red">${stats.escalated}</div><div class="stat-delta">Needs attention</div></div>
+      </div>
+      <div class="tickets-wrap">
+        <div style="padding:1rem 1.25rem;border-bottom:1px solid var(--border);font-family:var(--font-head);font-size:15px;font-weight:600">
+          ${currentRole === 'admin' ? 'Recent Tickets' : 'My Recent Tickets'}
+        </div>
+        ${recentTickets.length === 0
+          ? `<div class="empty-state"><div class="empty-icon">📋</div>No tickets yet</div>`
+          : `<table>
+              <tr><th>ID</th><th>Issue</th><th>Category</th><th>Priority</th><th>Status</th><th>SLA</th><th>Action</th></tr>
+              ${recentTickets.map(t => ticketRow(t, false)).join('')}
+            </table>`}
+      </div>`;
+  } catch (err) {
+    showError('main-content', 'Failed to load dashboard: ' + err.message);
+  }
+}
+
+// ================================================================
+// TICKETS LIST
+// ================================================================
+async function renderTicketsList(all) {
+  showLoading('main-content', 'Loading tickets…');
+  try {
+    const statusParam = filterStatus !== 'all' ? `&status=${filterStatus}` : '';
+    const data = await api('GET', `/tickets?${all ? '' : 'mine=true&'}limit=50&sortBy=createdAt&order=desc${statusParam}`);
+    tickets = data.tickets;
+
+    document.getElementById('main-content').innerHTML = `
+      <div class="section-head">
+        <div><div class="section-title">${all ? 'All Tickets' : 'My Tickets'}</div>
+        <div class="section-sub">${data.total} tickets</div></div>
+      </div>
+      <div class="tickets-wrap">
+        <div class="tickets-header">
+          <input placeholder="Search tickets…" oninput="clientSearch(this.value, ${all})">
+          <div class="filter-pills">
+            ${['all','pending','in-progress','escalated','resolved'].map(s =>
+              `<button class="fpill ${filterStatus===s?'active':''}" onclick="setFilter('${s}',${all})">${s==='all'?'All':s}</button>`
+            ).join('')}
+          </div>
+        </div>
+        <div id="ticket-table-body">
+          ${tickets.length === 0
+            ? `<div class="empty-state"><div class="empty-icon">📋</div>No tickets found</div>`
+            : `<table>
+                <tr><th>ID</th><th>Issue</th><th>Category</th><th>Priority</th><th>Assignee</th><th>Status</th><th>SLA</th><th>Actions</th></tr>
+                ${tickets.map(t => ticketRow(t, all)).join('')}
+              </table>`}
+        </div>
+      </div>`;
+  } catch (err) {
+    showError('main-content', 'Failed to load tickets: ' + err.message);
+  }
+}
+
+function ticketRow(t, all) {
+  const statusClass = t.status === 'in-progress' ? 'progress' : t.status;
+  const id = t.ticketId || t.id;
+  return `<tr>
+    <td class="tid">#${id}</td>
+    <td style="max-width:180px">${t.title}</td>
+    <td><span class="cat-tag">${t.category}</span></td>
+    <td><span class="priority-tag p-${t.priority}">${t.priority}</span></td>
+    <td style="font-size:12px">${t.assignedToName || 'Unassigned'}</td>
+    <td><span class="status-pill s-${statusClass}"><span class="s-dot"></span>${t.status}</span></td>
+    <td class="sla-timer">${slaDisplay(t)}</td>
+    <td><div class="action-btns">
+      <button class="btn btn-ghost btn-sm" onclick="viewTicket('${id}')">View</button>
+      ${all && t.status !== 'resolved' ? `<button class="btn btn-ghost btn-sm" onclick="openUpdateStatus('${id}')">Update</button>` : ''}
+      ${t.status === 'resolved' && !t.feedback ? `<button class="btn btn-ghost btn-sm" onclick="openRating('${id}')">Rate</button>` : ''}
+    </div></td>
+  </tr>`;
+}
+
+function setFilter(s, all) {
+  filterStatus = s;
+  renderTicketsList(all);
+}
+
+function clientSearch(q, all) {
+  const rows = document.querySelectorAll('#ticket-table-body tr:not(:first-child)');
+  rows.forEach(r => {
+    r.style.display = r.textContent.toLowerCase().includes(q.toLowerCase()) ? '' : 'none';
+  });
+}
+
+// ================================================================
+// VIEW SINGLE TICKET (from backend)
+// ================================================================
+async function viewTicket(id) {
+  try {
+    // Try local cache first for speed, then hit API
+    let t = tickets.find(x => (x.ticketId || x.id) === id);
+    if (!t) {
+      const data = await api('GET', `/tickets/${id}`);
+      t = data.ticket;
+    }
+    renderTicketModal(t);
+  } catch (err) {
+    alert('Could not load ticket: ' + err.message);
+  }
+}
+
+function renderTicketModal(t) {
+  const id = t.ticketId || t.id;
+  const statusClass = t.status === 'in-progress' ? 'progress' : t.status;
+  document.getElementById('modal-ticket-title').textContent = `#${id} — ${t.title}`;
+  document.getElementById('modal-body').innerHTML = `
+    <div class="flex mb">
+      <span class="status-pill s-${statusClass}"><span class="s-dot"></span>${t.status}</span>
+      <span class="priority-tag p-${t.priority}">${t.priority}</span>
+      <span class="cat-tag">${t.category}</span>
+    </div>
+    <div class="grid2 mb">
+      <div><div style="font-size:11px;color:var(--muted);font-family:var(--font-mono)">ASSIGNEE</div>
+           <div style="margin-top:4px;font-size:13px">${t.assignedToName || 'Unassigned'}</div></div>
+      <div><div style="font-size:11px;color:var(--muted);font-family:var(--font-mono)">SLA REMAINING</div>
+           <div style="margin-top:4px" class="sla-timer">${slaDisplay(t)}</div></div>
+      <div><div style="font-size:11px;color:var(--muted);font-family:var(--font-mono)">CREATED</div>
+           <div style="margin-top:4px;font-size:13px">${new Date(t.createdAt).toLocaleString('en-IN')}</div></div>
+      <div><div style="font-size:11px;color:var(--muted);font-family:var(--font-mono)">RAISED BY</div>
+           <div style="margin-top:4px;font-size:13px">${t.raisedByName || '—'}</div></div>
+    </div>
+    ${t.description ? `<div style="font-size:13px;color:var(--muted);margin-bottom:1rem;padding:10px;background:var(--surface2);border-radius:6px;border:1px solid var(--border)">${t.description}</div>` : ''}
+    ${t.feedback?.rating ? `
+      <div style="margin-bottom:1rem">
+        <div style="font-size:11px;color:var(--muted);font-family:var(--font-mono);margin-bottom:4px">SATISFACTION RATING</div>
+        <div class="stars">${'★'.repeat(t.feedback.rating)}<span style="color:var(--border)">${'★'.repeat(5 - t.feedback.rating)}</span></div>
+        ${t.feedback.comment ? `<div style="font-size:12px;color:var(--muted);margin-top:4px">"${t.feedback.comment}"</div>` : ''}
+      </div>` : ''}
+    ${t.photos?.length ? `
+      <div style="margin-bottom:1rem">
+        <div style="font-size:11px;color:var(--muted);font-family:var(--font-mono);margin-bottom:6px">PHOTO EVIDENCE</div>
+        <div class="photo-preview">${t.photos.map(p => `<img src="${p.url}" class="photo-thumb" onclick="window.open('${p.url}')">`).join('')}</div>
+      </div>` : ''}
+    <div class="divider"></div>
+    <div style="font-family:var(--font-head);font-size:14px;font-weight:600;margin-bottom:.75rem">Status Timeline</div>
+    <div class="timeline">
+      ${(t.timeline || []).map(tl => `
+      <div class="tl-item">
+        <div class="tl-dot ${tl.type}">${tl.type==='done'?'✓':tl.type==='current'?'▶':tl.type==='escalated-dot'?'!':'○'}</div>
+        <div class="tl-body">
+          <div class="tl-title">${tl.status}</div>
+          <div class="tl-time">${tl.timestamp ? new Date(tl.timestamp).toLocaleString('en-IN') : (tl.time || '—')}</div>
+          ${tl.note ? `<div class="tl-note">${tl.note}</div>` : ''}
+        </div>
+      </div>`).join('')}
+    </div>
+    ${currentRole === 'admin' && t.status !== 'resolved' ? `
+    <div class="divider"></div>
+    <div style="font-family:var(--font-head);font-size:14px;font-weight:600;margin-bottom:.75rem">Admin Actions</div>
+    <div class="flex" style="flex-wrap:wrap;gap:8px">
+      <button class="btn btn-ghost btn-sm" onclick="adminAction('${id}','in-progress')">Mark In Progress</button>
+      <button class="btn btn-ghost btn-sm" onclick="adminAction('${id}','resolved')">Mark Resolved</button>
+      <button class="btn btn-danger btn-sm" onclick="adminAction('${id}','escalated')">Escalate</button>
+    </div>` : ''}
+    ${t.status === 'resolved' && !t.feedback ? `
+    <div class="divider"></div>
+    <button class="btn btn-primary" onclick="closeModal();openRating('${id}')">Rate this Resolution ★</button>` : ''}
+  `;
+  document.getElementById('modal-detail').classList.add('open');
+}
+
+function closeModal() { document.getElementById('modal-detail').classList.remove('open'); }
+
+async function adminAction(id, newStatus) {
+  try {
+    await api('PUT', `/tickets/${id}/status`, { status: newStatus, note: `Updated by admin` });
+    addNotifLocal(`Ticket ${id} → ${newStatus}`);
+    closeModal();
+    renderDashboard();
+  } catch (err) { alert('Error: ' + err.message); }
+}
+
+async function openUpdateStatus(id) {
+  const s = prompt('New status:\npending / in-progress / resolved / escalated');
+  if (!s) return;
+  const valid = ['pending','in-progress','resolved','escalated','closed'];
+  if (!valid.includes(s)) { alert('Invalid status'); return; }
+  try {
+    await api('PUT', `/tickets/${id}/status`, { status: s, note: 'Updated by admin' });
+    addNotifLocal(`Ticket ${id} updated to ${s}`);
+    renderTicketsList(true);
+  } catch (err) { alert('Error: ' + err.message); }
+}
+
+// ================================================================
+// NEW TICKET FORM
+// ================================================================
+function renderNewTicket() {
+  document.getElementById('main-content').innerHTML = `
+    <div class="section-head">
+      <div><div class="section-title">New Maintenance Request</div>
+      <div class="section-sub">Describe your issue — AI will help categorize it</div></div>
+    </div>
+    <div class="form-card">
+      <div class="form-group">
+        <label>Issue Title</label>
+        <input type="text" id="t-title" placeholder="e.g. AC not cooling in Meeting Room 3B" oninput="aiSuggest(this.value + ' ' + (document.getElementById('issue-desc')?.value||''))">
+      </div>
+      <div class="form-group">
+        <label>Describe your issue in detail</label>
+        <textarea id="issue-desc" rows="3" placeholder="More details help AI categorize correctly…" oninput="aiSuggest(document.getElementById('t-title').value + ' ' + this.value)"></textarea>
+        <div class="ai-suggestion" id="ai-box">
+          <div class="ai-label">AI Smart Suggestion</div>
+          <div class="ai-row" id="ai-chips"></div>
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="form-group">
+          <label>Category</label>
+          <select id="t-category">
+            <option>IT</option><option>HVAC</option><option>Plumbing</option><option>Electrical</option><option>Civil</option><option>Housekeeping</option><option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Priority</label>
+          <select id="t-priority">
+            <option value="low">Low</option><option value="medium" selected>Medium</option><option value="high">High</option><option value="critical">Critical</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="form-group"><label>Building</label><input type="text" id="t-building" placeholder="Block A"></div>
+        <div class="form-group"><label>Floor / Room</label><input type="text" id="t-room" placeholder="3rd Floor, Room 3B"></div>
+      </div>
+      <div class="form-group">
+        <label>Attach Photo Evidence (up to 5)</label>
+        <div class="photo-upload" onclick="document.getElementById('photo-inp').click()">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.5" style="margin-bottom:6px"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+          <div style="font-size:13px;color:var(--muted)">Click to upload photos</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">PNG, JPG up to 5MB each</div>
+          <input type="file" id="photo-inp" accept="image/*" multiple style="display:none" onchange="previewPhoto(this)">
+        </div>
+        <div class="photo-preview" id="photo-preview"></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:1rem">
+        <input type="checkbox" id="auto-assign" checked style="accent-color:var(--accent)">
+        <label for="auto-assign" style="font-size:13px;color:var(--muted)">Auto-assign to available technician</label>
+      </div>
+      <button class="btn btn-primary" id="submit-btn" onclick="submitTicket()">Submit Request →</button>
+    </div>`;
+}
+
+// AI suggestion (calls backend)
+let aiTimeout;
+function aiSuggest(val) {
+  clearTimeout(aiTimeout);
+  if (val.trim().length < 8) { document.getElementById('ai-box')?.classList.remove('show'); return; }
+  aiTimeout = setTimeout(async () => {
+    try {
+      const title = document.getElementById('t-title')?.value || '';
+      const desc  = document.getElementById('issue-desc')?.value || '';
+      const data  = await api('POST', '/tickets/ai-classify', { title, description: desc });
+      document.getElementById('ai-chips').innerHTML = `
+        <div class="ai-chip" onclick="applyAI('${data.category}','${data.priority}')">Category: <b>${data.category}</b></div>
+        <div class="ai-chip" onclick="applyAI('${data.category}','${data.priority}')">Priority: <b>${data.priority}</b></div>
+        <div class="ai-chip" style="color:var(--accent)">Confidence: ${data.confidence}%</div>
+        ${data.keywords?.map(k => `<div class="ai-chip">${k}</div>`).join('') || ''}
+      `;
+      document.getElementById('ai-box').classList.add('show');
+    } catch (_) {}
+  }, 600);
+}
+
+function applyAI(cat, pri) {
+  document.getElementById('t-category').value = cat;
+  document.getElementById('t-priority').value = pri;
+}
+
+function previewPhoto(inp) {
+  const prev = document.getElementById('photo-preview');
+  Array.from(inp.files).forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = document.createElement('img');
+      img.src = e.target.result; img.className = 'photo-thumb';
+      prev.appendChild(img);
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+async function submitTicket() {
+  const title = document.getElementById('t-title')?.value.trim();
+  const desc  = document.getElementById('issue-desc').value.trim();
+  if (!title) { alert('Please enter an issue title.'); return; }
+  if (!desc)  { alert('Please describe your issue.'); return; }
+
+  const btn = document.getElementById('submit-btn');
+  btn.textContent = 'Submitting…'; btn.disabled = true;
+
+  try {
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('description', desc);
+    formData.append('category', document.getElementById('t-category').value);
+    formData.append('priority', document.getElementById('t-priority').value);
+    formData.append('building', document.getElementById('t-building')?.value || '');
+    formData.append('floor', document.getElementById('t-room')?.value || '');
+    formData.append('autoAssign', document.getElementById('auto-assign').checked ? 'true' : 'false');
+    const photoFiles = document.getElementById('photo-inp').files;
+    Array.from(photoFiles).forEach(f => formData.append('photos', f));
+
+    const data = await api('POST', '/tickets', formData, true);
+    addNotifLocal(`✅ Ticket ${data.ticket.ticketId} submitted!`);
+    alert(`Ticket ${data.ticket.ticketId} submitted!\nAI Category: ${data.ai.suggestedCategory} (${data.ai.confidence}% confidence)\nAssigned to: ${data.ticket.assignedToName}`);
+    showTab('tickets');
+  } catch (err) {
+    alert('Error submitting ticket: ' + err.message);
+  } finally {
+    btn.textContent = 'Submit Request →'; btn.disabled = false;
+  }
+}
+
+// ================================================================
+// ANALYTICS (live from backend)
+// ================================================================
+async function renderAnalytics() {
+  showLoading('main-content', 'Loading analytics…');
+  try {
+    const data = await api('GET', '/analytics/dashboard');
+    const { stats, categoryBreakdown, priorityBreakdown, techLeaderboard } = data;
+
+    const cats   = categoryBreakdown.map(c => c._id);
+    const counts = categoryBreakdown.map(c => c.count);
+    const maxC   = Math.max(...counts, 1);
+    const statuses = ['pending','in-progress','resolved','escalated'];
+    const sCounts  = [stats.pending, stats.inProgress, stats.resolved, stats.escalated];
+    const maxS     = Math.max(...sCounts, 1);
+
+    document.getElementById('main-content').innerHTML = `
+      <div class="section-head"><div><div class="section-title">Analytics Dashboard</div>
+      <div class="section-sub">System-wide ticket insights</div></div></div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-label">TOTAL TICKETS</div><div class="stat-value">${stats.total}</div><div class="stat-delta">All time</div></div>
+        <div class="stat-card"><div class="stat-label">ESCALATION RATE</div><div class="stat-value warn">${Math.round((stats.escalated/Math.max(stats.total,1))*100)}%</div><div class="stat-delta">Of all tickets</div></div>
+        <div class="stat-card"><div class="stat-label">RESOLUTION RATE</div><div class="stat-value green">${stats.resolutionRate}%</div><div class="stat-delta">Completion rate</div></div>
+        <div class="stat-card"><div class="stat-label">AVG RESOLUTION</div><div class="stat-value blue">${stats.avgResolutionHours ?? '—'}h</div><div class="stat-delta">Average fix time</div></div>
+      </div>
+      <div class="grid2">
+        <div class="tickets-wrap" style="padding:1.25rem">
+          <div style="font-family:var(--font-head);font-size:14px;font-weight:600;margin-bottom:1rem">Tickets by Category</div>
+          <div class="chart-wrap">
+            ${cats.map((c, i) => `
+            <div class="chart-bar-col">
+              <div class="chart-val">${counts[i]}</div>
+              <div class="chart-bar" style="height:${Math.round(counts[i]/maxC*90)}px;background:var(--accent);opacity:${0.4+counts[i]/maxC*0.6}"></div>
+              <div class="chart-label">${c}</div>
+            </div>`).join('')}
+          </div>
+        </div>
+        <div class="tickets-wrap" style="padding:1.25rem">
+          <div style="font-family:var(--font-head);font-size:14px;font-weight:600;margin-bottom:1rem">Tickets by Status</div>
+          <div class="chart-wrap">
+            ${statuses.map((s, i) => `
+            <div class="chart-bar-col">
+              <div class="chart-val">${sCounts[i]}</div>
+              <div class="chart-bar" style="height:${Math.round(sCounts[i]/maxS*90)}px;background:${['var(--warn)','var(--accent2)','var(--accent)','var(--danger)'][i]}"></div>
+              <div class="chart-label" style="font-size:9px">${s}</div>
+            </div>`).join('')}
+          </div>
+        </div>
+      </div>
+      <div class="tickets-wrap mt" style="padding:1.25rem">
+        <div style="font-family:var(--font-head);font-size:14px;font-weight:600;margin-bottom:1rem">Technician Leaderboard</div>
+        <table>
+          <tr><th>Technician</th><th>Department</th><th>Resolved</th><th>Avg Rating</th><th>Active</th></tr>
+          ${techLeaderboard.map(tech => `<tr>
+            <td><div class="flex"><div class="avatar">${tech.name.split(' ').map(x=>x[0]).join('')}</div>${tech.name}</div></td>
+            <td><span class="cat-tag">${tech.department}</span></td>
+            <td>${tech.totalResolved}</td>
+            <td>${tech.avgRating ? `<span style="color:var(--warn)">${tech.avgRating}★</span>` : '—'}</td>
+            <td><div style="display:flex;align-items:center;gap:8px">
+              <div style="flex:1;height:6px;background:var(--surface2);border-radius:3px">
+                <div style="width:${Math.min(tech.activeTicketCount/5*100,100)}%;height:100%;background:var(--accent2);border-radius:3px"></div>
+              </div>
+              <span style="font-size:11px;color:var(--muted)">${tech.activeTicketCount} open</span>
+            </div></td>
+          </tr>`).join('')}
+        </table>
+      </div>`;
+  } catch (err) {
+    showError('main-content', 'Failed to load analytics: ' + err.message);
+  }
+}
+
+// ================================================================
+// HEATMAP (live from backend)
+// ================================================================
+async function renderHeatmap() {
+  showLoading('main-content', 'Loading heatmap…');
+  try {
+    const data = await api('GET', '/analytics/heatmap');
+    const { heatmap, days: dayOrder } = data;
+    const days  = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    const hours = ['8am','9am','10am','11am','12pm','1pm','2pm','3pm','4pm','5pm','6pm'];
+    const hourIndices = [8,9,10,11,12,13,14,15,16,17,18];
+
+    // Build matrix: days × hours
+    const matrix = days.map(d =>
+      hourIndices.map(h => (heatmap[d] && heatmap[d][h]) ? heatmap[d][h] : 0)
+    );
+
+    document.getElementById('main-content').innerHTML = `
+      <div class="section-head"><div><div class="section-title">Issue Heatmap</div>
+      <div class="section-sub">Ticket volume by day and hour — spot peak problem times</div></div></div>
+      <div class="tickets-wrap" style="padding:1.5rem">
+        <div style="font-size:12px;color:var(--muted);margin-bottom:1rem;font-family:var(--font-mono)">Live data from backend — click any cell for details</div>
+        <div style="display:flex;gap:8px">
+          <div style="display:flex;flex-direction:column;gap:6px;padding-top:28px">
+            ${hours.map(h => `<div style="height:40px;display:flex;align-items:center;font-size:10px;font-family:var(--font-mono);color:var(--muted);width:32px">${h}</div>`).join('')}
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;flex:1">
+            ${days.map((d, di) => `
+            <div>
+              <div style="font-size:11px;font-family:var(--font-mono);color:var(--muted);text-align:center;margin-bottom:6px">${d}</div>
+              ${matrix[di].map((v, hi) => {
+                const cls = v === 0 ? 0 : v === 1 ? 1 : v <= 3 ? 2 : 4;
+                return `<div class="hm-cell hm-${cls}" style="margin-bottom:6px" title="${v} tickets — ${d} ${hours[hi]}" onclick="heatmapClick('${d}','${hours[hi]}','${v}')">${v > 0 ? v : ''}</div>`;
+              }).join('')}
+            </div>`).join('')}
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:1rem;font-size:11px;font-family:var(--font-mono);color:var(--muted)">
+          Intensity:
+          <div style="width:18px;height:18px;border-radius:4px;background:var(--surface2)"></div> 0
+          <div style="width:18px;height:18px;border-radius:4px;background:rgba(0,229,160,.15)"></div> 1
+          <div style="width:18px;height:18px;border-radius:4px;background:rgba(0,229,160,.3)"></div> 2–3
+          <div style="width:18px;height:18px;border-radius:4px;background:var(--accent)"></div> 4+
+        </div>
+        <div id="hm-detail" style="margin-top:1rem"></div>
+      </div>`;
+  } catch (err) {
+    showError('main-content', 'Failed to load heatmap: ' + err.message);
+  }
+}
+
+function heatmapClick(day, hour, count) {
+  document.getElementById('hm-detail').innerHTML = count == 0
+    ? `<div style="color:var(--muted);font-size:13px">No tickets on ${day} at ${hour}</div>`
+    : `<div class="tickets-wrap" style="padding:1rem;margin-top:0">
+        <div style="font-family:var(--font-mono);font-size:12px;color:var(--accent)">◆ ${count} ticket(s) on ${day} at ${hour}</div>
+       </div>`;
+}
+
+// ================================================================
+// NOTIFICATIONS (live from backend)
+// ================================================================
+async function loadNotifications() {
+  try {
+    const data = await api('GET', '/notifications?limit=20');
+    notifications = data.notifications;
+    renderNotifs();
+  } catch (_) {}
+}
+
+function renderNotifs() {
+  document.getElementById('notif-list').innerHTML = notifications.length === 0
+    ? `<div style="padding:1rem;color:var(--muted);font-size:13px;text-align:center">No notifications</div>`
+    : notifications.map(n => `
+      <div class="notif-item ${!n.read ? 'notif-unread' : ''}" onclick="markRead('${n._id || n.id}')">
+        <div class="notif-title">${n.title}</div>
+        <div class="notif-time">${timeAgo(n.createdAt)}</div>
+      </div>`).join('');
+  const unread = notifications.filter(n => !n.read).length;
+  document.getElementById('notif-count-txt').textContent = unread + ' unread';
+  document.getElementById('notif-dot').style.display = unread > 0 ? '' : 'none';
+}
+
+function addNotifLocal(msg) {
+  notifications.unshift({ _id: Date.now(), title: msg, createdAt: new Date(), read: false });
+  renderNotifs();
+}
+
+async function markRead(id) {
+  try {
+    await api('PUT', `/notifications/${id}/read`);
+    const n = notifications.find(x => (x._id || x.id) == id);
+    if (n) n.read = true;
+    renderNotifs();
+  } catch (_) {
+    const n = notifications.find(x => (x._id || x.id) == id);
+    if (n) n.read = true;
+    renderNotifs();
+  }
+}
+
+function toggleNotif() {
+  const panel = document.getElementById('notif-panel');
+  panel.classList.toggle('open');
+  if (panel.classList.contains('open')) loadNotifications();
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('#notif-panel') && !e.target.closest('#notif-btn'))
+    document.getElementById('notif-panel').classList.remove('open');
+});
+
+function timeAgo(date) {
+  if (!date) return '';
+  const diff = Date.now() - new Date(date);
+  const m = Math.floor(diff / 60000);
+  if (m < 1) return 'just now';
+  if (m < 60) return `${m} min ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h} hr ago`;
+  return `${Math.floor(h / 24)} days ago`;
+}
+
+// ================================================================
+// RATING (calls backend)
+// ================================================================
+function openRating(id) {
+  ratingTicketId = id; selectedRating = 0;
+  document.querySelectorAll('.star').forEach(s => s.classList.remove('lit'));
+  document.getElementById('rate-comment').value = '';
+  document.getElementById('modal-rate').classList.add('open');
+}
+
+function setRating(n) {
+  selectedRating = n;
+  document.querySelectorAll('.star').forEach((s, i) => s.classList.toggle('lit', i < n));
+}
+
+async function submitRating() {
+  if (!selectedRating) { alert('Please select a rating.'); return; }
+  try {
+    await api('POST', `/tickets/${ratingTicketId}/feedback`, {
+      rating: selectedRating,
+      comment: document.getElementById('rate-comment').value,
+    });
+    document.getElementById('modal-rate').classList.remove('open');
+    addNotifLocal(`You rated ticket ${ratingTicketId} — ${selectedRating}★`);
+    renderDashboard();
+  } catch (err) {
+    alert('Error submitting rating: ' + err.message);
+  }
+}
+
+// ================================================================
+// AUTO-RESTORE SESSION on page reload
+// ================================================================
+(function restoreSession() {
+  const token = localStorage.getItem('fixit_token');
+  const user  = localStorage.getItem('fixit_user');
+  if (token && user) {
+    authToken   = token;
+    currentUser = JSON.parse(user);
+    currentRole = currentUser.role === 'superadmin' ? 'admin' : currentUser.role;
+    setupNav();
+    connectSocket();
+    loadNotifications();
+    showTab('dashboard');
+  } else {
+    document.getElementById('page-login').style.display = 'flex';
+    document.querySelectorAll('.page:not(#page-login)').forEach(p => p.style.display = 'none');
+  }
+})();
+</script>
+</body>
+</html>
